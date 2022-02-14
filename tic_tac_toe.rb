@@ -1,71 +1,71 @@
+# frozen_string_literal: true
+
+# The Board class represents the tic-tac-toe board; storing
+# relevant data and keeping track of the game state.
 class Board
-  attr_reader :current_player
+  attr_reader :current_player, :state
+
   def initialize
     @state = (1..9).to_a
     @current_player = 'X'
   end
 
-  public
   def print
     puts
-    for row in 0...3
+    (0...3).each do |row|
       i = 3 * row
       puts " #{@state[i]} | #{@state[i + 1]} | #{@state[i + 2]}"
-      unless row == 2
-        puts "-----------" 
-      end
+      puts '-----------' unless row == 2
     end
     puts
   end
 
-  public
   def add_piece(location)
     @state[location - 1] = @current_player
-    unless game_over?
-      switch_player
-    end
+    switch_player unless game_over?
   end
 
-  public
   def game_over?
-    if check_rows || check_cols || check_diag
-      return true
-    end
-    false
+    check_rows || check_cols || check_diag
   end
 
-  private
   def switch_player
     @current_player = @current_player == 'X' ? 'O' : 'X'
   end
 
-  private
   def check_rows
-    for row in 0...3
+    (0...3).each do |row|
       i = 3 * row
       return true if @state[i] == @state[i + 1] && @state[i] == @state[i + 2]
     end
     false
   end
 
-  private
   def check_cols
-    for col in 0...3
+    (0...3).each do |col|
       i = 3 * col
       return true if @state[i] == @state[i + 3] && @state[i] == @state[i + 6]
     end
     false
   end
 
-  private
   def check_diag
-    if @state[0] == @state[4] && @state[4] == @state[8]
-      return true
-    elsif @state[2] == @state[4] && @state[4] == @state[6]
-      return true
-    end
+    return true if @state[0] == @state[4] && @state[4] == @state[8]
+    return true if @state[2] == @state[4] && @state[4] == @state[6]
+
     false
   end
+end
+
+def get_move(board)
+  puts 'Where would you like to place your piece?'
+  move = gets.chomp.to_i
+  raise exception unless Integer(board.state[move - 1])
+
+  move
+rescue StandardError
+  puts 'Please enter a valid slot'
+  retry
 end
 
 def main
@@ -74,8 +74,7 @@ def main
   until board.game_over?
     board.print
     puts "#{board.current_player}'s turn"
-    puts "Where would you like to place your piece?"
-    move = gets.chomp.to_i
+    move = get_move(board)
     board.add_piece(move)
   end
 
